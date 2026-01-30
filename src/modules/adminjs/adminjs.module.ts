@@ -47,7 +47,7 @@ const redisClient = createClient({
   ...(REDIS_URL
     ? { url: REDIS_URL }
     : {
-        name: String(REDIS_USERNAME),
+        username: String(REDIS_USERNAME),
         password: String(REDIS_PASSWORD),
         socket: {
           host: String(REDIS_HOST),
