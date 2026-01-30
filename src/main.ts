@@ -8,7 +8,7 @@ import {
   ValidationPipe,
   VersioningType,
 } from '@nestjs/common';
-import { CORS_ORIGINS, PORT, STAGING_SERVER_URL } from './common';
+import { PORT, STAGING_SERVER_URL } from './common';
 import {
   DocumentBuilder,
   SwaggerCustomOptions,
