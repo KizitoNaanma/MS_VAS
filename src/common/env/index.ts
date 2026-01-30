@@ -57,7 +57,8 @@ export const ADMIN_JS_EMAIL = configService.get('ADMIN_JS_EMAIL');
 
 export const ADMIN_JS_PWD = configService.get('ADMIN_JS_PWD');
 
-export const STAGING_SERVER_URL = configService.get('STAGING_SERVER_URL');
+export const STAGING_SERVER_URL =
+  configService.get('STAGING_SERVER_URL') || process.env.STAGING_SERVER_URL;
 
 export const SMTP_HOST = configService.get('SMTP_HOST');
 export const SMTP_FROM_EMAIL = configService.get('SMTP_FROM_EMAIL');
