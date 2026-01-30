@@ -1,0 +1,24 @@
+version: '3.8'
+
+volumes:
+  redis_data:
+
+services:
+  nestjs-app:
+    container_name: religious-notifs-api
+    build:
+      context: .
+      dockerfile: Dockerfile.dev # Changed to use the dev Dockerfile
+    image: religious-notifs-app-dev # Changed image name to indicate dev version
+    ports:
+      - '4000:4000'
+    volumes:
+      - .:/usr/src/app # Added for hot-reloading
+      - /usr/src/app/node_modules # Added to preserve container node_modules
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:12345@host.docker.internal:5432/religious-notif-db-local
+    env_file:
+      - .env.production
+    extra_hosts:
+      - 'host.docker.internal:host-gateway' # Added for database connection

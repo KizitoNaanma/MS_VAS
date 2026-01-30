@@ -1,0 +1,855 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi", "typedSql", "nativeDistinct"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// generator nestjs_dto_generator {
+//   provider             = "prisma-nestjs-dto-generator"
+//   output               = "src/core/dto/generated"
+//   enableModel          = true // default: true
+//   modelFileNameSuffix  = ".model" // default: ".model"
+//   modelClassNameSuffix = "Model" // default: ""
+//   enableSwagger        = true // default: false
+//   dtoClassNameSuffix   = "Dto" // default: "Dto"
+//   dtoFileNameSuffix    = ".dto" // default: ".dto"
+//   toLowerCase          = false // field name to lower case, default: false
+// }
+
+generator nestjsDto {
+  provider                        = "prisma-generator-nestjs-dto"
+  output                          = "generated"
+  outputToNestJsResourceStructure = "false"
+  flatResourceStructure           = "false"
+  exportRelationModifierClasses   = "true"
+  reExport                        = "false"
+  generateFileTypes               = "all"
+  createDtoPrefix                 = "Create"
+  updateDtoPrefix                 = "Update"
+  dtoSuffix                       = "Dto"
+  entityPrefix                    = ""
+  entitySuffix                    = "Entity"
+  classValidation                 = "true"
+  fileNamingStyle                 = "camel"
+  noDependencies                  = "false"
+  outputType                      = "class"
+  definiteAssignmentAssertion     = "false"
+  requiredResponseApiProperty     = "true"
+  prettier                        = "true"
+  outputApiPropertyType           = "true"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+enum AdminUserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model User {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastLogin DateTime @default(now())
+
+  email String? @unique @db.Text
+  phone String? @unique @db.Text
+
+  firstName    String
+  lastName     String
+  fullName     String
+  dob          DateTime?
+  religion     String?
+  profilePhoto String?
+
+  passwordHash  String? @unique
+  refreshToken  String  @default("")
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+
+  preferredNotificationTime DateTime?
+  dailyNotifications        Boolean   @default(false)
+  emailNotifications        Boolean   @default(true)
+  smsNotifications          Boolean   @default(true)
+  pushNotifications         Boolean   @default(true)
+  isActive                  Boolean   @default(true)
+  deactivatedAt             DateTime?
+
+  signUpType              String
+  roles                   UserRole[]                @default([USER])
+  adminStatus             AdminUserStatus?
+  journals                Journal[]
+  courseEnrollments       CourseEnrollment[]
+  messages                Message[]
+  createdGroups           Group[]                   @relation("GroupCreator")
+  groupMemberships        GroupMember[]
+  favourites              TrackFavorite[]
+  subscriptions           Subscription[]
+  transactions            Transaction[]
+  availableQuizAttempts   Int                       @default(0)
+  quizAttempts            QuizAttempt[]
+  quizUserAnswers         QuizUserAnswer[]
+  wallet                  Wallet?
+  bankAccounts            BankAccount[]
+  SubscriptionAuditRecord SubscriptionAuditRecord[]
+
+  @@index(fields: [email, phone])
+}
+
+model Webhooks {
+  id     String @id @default(uuid())
+  data   Json
+  source String
+}
+
+// Journal
+model Journal {
+  id          String   @id @default(uuid())
+  title       String
+  body        String   @db.Text
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Religion
+model Religion {
+  id                          String                        @id @default(uuid())
+  name                        String
+  code                        String
+  noun                        String
+  adjective                   String
+  dailyPrayers                DailyPrayer[]
+  themes                      Theme[]
+  dailyScriptures             DailyScripture[]
+  /// @DtoReadOnly
+  /// @description The date the religion was created  
+  createdAt                   DateTime                      @default(now())
+  /// @DtoReadOnly
+  /// @description The date the religion was last updated
+  updatedAt                   DateTime                      @updatedAt
+  dailyDevotionals            DailyDevotional[]
+  courses                     Course[]
+  courseCategories            CourseCategory[]
+  courseTopics                CourseTopic[]
+  mindfulnessResourceCategory MindfulnessResourceCategory[]
+  tracks                      Track[]
+  artists                     Artist[]
+  albums                      Album[]
+  quotes                      Quote[]
+  groups                      Group[]
+  quizSets                    QuizSet[]
+}
+
+model Theme {
+  id              String            @id @default(uuid())
+  name            String
+  code            String
+  religion        Religion          @relation(fields: [religionId], references: [id])
+  religionId      String
+  dailyPrayer     DailyPrayer[]
+  dailyScripture  DailyScripture[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  dailyDevotional DailyDevotional[]
+  quizSets        QuizSet[]
+}
+
+// Daily Prayer
+model DailyPrayer {
+  id         String   @id @default(uuid())
+  dayId      Int
+  content    String
+  theme      Theme    @relation(fields: [themeId], references: [id])
+  themeId    String
+  religion   Religion @relation(fields: [religionId], references: [id])
+  religionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model DailyScripture {
+  id         String   @id @default(uuid())
+  dayId      Int
+  content    String
+  theme      Theme    @relation(fields: [themeId], references: [id])
+  themeId    String
+  religion   Religion @relation(fields: [religionId], references: [id])
+  religionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model DailyDevotional {
+  id         String   @id @default(uuid())
+  dayId      Int
+  content    String   @db.Text
+  theme      Theme    @relation(fields: [themeId], references: [id])
+  themeId    String
+  religion   Religion @relation(fields: [religionId], references: [id])
+  religionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Course
+model CourseCategory {
+  id           String        @id @default(uuid())
+  name         String
+  code         String
+  religion     Religion      @relation(fields: [religionId], references: [id])
+  religionId   String
+  courses      Course[]
+  courseTopics CourseTopic[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model CourseTopic {
+  id               String         @id @default(uuid())
+  name             String
+  code             String
+  religion         Religion       @relation(fields: [religionId], references: [id])
+  religionId       String
+  courses          Course[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  courseCategory   CourseCategory @relation(fields: [courseCategoryId], references: [id])
+  courseCategoryId String
+}
+
+model CourseLesson {
+  id                   String                 @id @default(uuid())
+  name                 String
+  content              String
+  course               Course                 @relation(fields: [courseId], references: [id])
+  courseId             String
+  ordering             Int
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  courseLessonProgress CourseLessonProgress[]
+}
+
+model CourseAuthor {
+  id      String   @id @default(uuid())
+  name    String
+  courses Course[]
+}
+
+model Course {
+  id                String             @id @default(uuid())
+  name              String
+  description       String
+  videoObjectKey    String?
+  imageObjectKey    String?
+  duration          Int?
+  isFree            Boolean            @default(false)
+  religion          Religion           @relation(fields: [religionId], references: [id])
+  religionId        String
+  category          CourseCategory     @relation(fields: [categoryId], references: [id])
+  categoryId        String
+  author            CourseAuthor?      @relation(fields: [authorId], references: [id])
+  authorId          String?
+  courseTopic       CourseTopic        @relation(fields: [courseTopicId], references: [id])
+  courseTopicId     String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  lessons           CourseLesson[]
+  courseEnrollments CourseEnrollment[]
+}
+
+model CourseEnrollment {
+  id             String                 @id @default(uuid())
+  user           User                   @relation(fields: [userId], references: [id])
+  userId         String
+  course         Course                 @relation(fields: [courseId], references: [id])
+  courseId       String
+  status         EnrollmentStatus       @default(ENROLLED)
+  startedAt      DateTime               @default(now())
+  completedAt    DateTime?
+  lastAccessedAt DateTime               @default(now())
+  // progress       Float                  @default(0) // Percentage of course completed
+  /// @DtoReadOnly
+  /// @description The percentage of the course completed
+  progress       Decimal                @default(0) @db.Decimal(5, 2)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  lessonProgress CourseLessonProgress[]
+
+  @@unique([userId, courseId])
+}
+
+model CourseLessonProgress {
+  id             String           @id @default(uuid())
+  enrollment     CourseEnrollment @relation(fields: [enrollmentId], references: [id])
+  enrollmentId   String
+  lesson         CourseLesson     @relation(fields: [lessonId], references: [id])
+  lessonId       String
+  status         LessonStatus     @default(NOT_STARTED)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  lastAccessedAt DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([enrollmentId, lessonId])
+}
+
+enum EnrollmentStatus {
+  ENROLLED
+  IN_PROGRESS
+  COMPLETED
+  DROPPED
+}
+
+enum LessonStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+// Mindfulness Resources
+model MindfulnessResourceCategory {
+  id                  String                @id @default(uuid())
+  name                String
+  code                String
+  religion            Religion              @relation(fields: [religionId], references: [id])
+  religionId          String
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  MindfulnessResource MindfulnessResource[]
+}
+
+model MindfulnessResource {
+  id             String                      @id @default(uuid())
+  name           String
+  category       MindfulnessResourceCategory @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  textContent    String?
+  audioObjectKey String?
+  imageObjectKey String?
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+}
+
+// Music Library
+model Track {
+  id             String          @id @default(uuid())
+  name           String
+  artist         Artist          @relation(fields: [artistId], references: [id])
+  artistId       String
+  /// @description The duration of the track in seconds
+  duration       Int
+  album          Album?          @relation(fields: [albumId], references: [id])
+  albumId        String?
+  religion       Religion        @relation(fields: [religionId], references: [id])
+  religionId     String
+  audioObjectKey String
+  imageObjectKey String?
+  isSingle       Boolean         @default(false)
+  favourites     TrackFavorite[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model TrackFavorite {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  track     Track    @relation(fields: [trackId], references: [id])
+  trackId   String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, trackId])
+}
+
+model Artist {
+  id             String    @id @default(uuid())
+  name           String
+  imageObjectKey String?
+  /// @DtoReadOnly
+  slug           String
+  religion       Religion? @relation(fields: [religionId], references: [id])
+  religionId     String?
+  tracks         Track[]
+  albums         Album[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Album {
+  id             String    @id @default(uuid())
+  name           String
+  imageObjectKey String?
+  /// @DtoReadOnly
+  slug           String
+  religion       Religion? @relation(fields: [religionId], references: [id])
+  religionId     String?
+  artists        Artist[]
+  tracks         Track[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Quote {
+  id         String   @id @default(uuid())
+  content    String
+  author     String
+  religion   Religion @relation(fields: [religionId], references: [id])
+  religionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Groups and Chat
+enum GroupVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+model Group {
+  id          String          @id @default(uuid())
+  name        String
+  description String
+  /// @DtoCreateOptional
+  visibility  GroupVisibility @default(PUBLIC)
+  religion    Religion        @relation(fields: [religionId], references: [id])
+  religionId  String
+  createdBy   User            @relation("GroupCreator", fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  messages    Message[]
+  members     GroupMember[]
+}
+
+model Message {
+  id          String       @id @default(uuid())
+  content     String
+  group       Group        @relation(fields: [groupId], references: [id])
+  groupId     String
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdById String
+  attachments Attachment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  filename  String
+  objectKey String
+  mimeType  String
+  size      Int
+  message   Message  @relation(fields: [messageId], references: [id])
+  messageId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum GroupRole {
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+model GroupMember {
+  id       String    @id @default(uuid())
+  group    Group     @relation(fields: [groupId], references: [id])
+  groupId  String
+  user     User      @relation(fields: [userId], references: [id])
+  userId   String
+  joinedAt DateTime  @default(now())
+  // Optional: You might want to add a role field for different member types
+  role     GroupRole @default(MEMBER)
+
+  @@unique([groupId, userId])
+}
+
+// Icell
+model IcellDatasync {
+  id             Int                      @id @default(autoincrement())
+  serviceType    String
+  result         String                   @db.Text
+  sequenceNo     String
+  callingParty   String
+  contentId      String
+  resultCode     String
+  bearerId       String
+  operationId    String
+  serviceNode    String
+  serviceId      String
+  category       String
+  processingTime String
+  chargeAmount   String
+  chargingMode   String
+  requestedPlan  String
+  appliedPlan    String
+  validityType   String
+  validityDays   String
+  renFlag        String
+  keyword        String?
+  requestNo      String?
+  createdAt      DateTime                 @default(now())
+  auditRecord    SubscriptionAuditRecord?
+  processed      Boolean                  @default(false)
+
+  @@index([result])
+  @@index([sequenceNo])
+  @@index([callingParty])
+  @@index([operationId])
+}
+
+enum OperationType {
+  SUBSCRIPTION
+  UNSUBSCRIPTION
+  ONDEMAND
+  RENEWAL
+  UNKNOWN
+}
+
+model Subscription {
+  id                    String             @id @default(uuid())
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+  userPhoneNumber       String // The phone number of the user
+  productId             String // Maps to product ID in icell-products.json
+  productName           String
+  serviceId             String // Maps to service ID in icell-products.json
+  serviceName           String
+  serviceType           String // Maps to service type in icell-products.json
+  amount                Decimal            @db.Decimal(10, 2)
+  operationType         OperationType
+  txnRef                String?
+  sequenceNo            String
+  startDate             DateTime           @default(now())
+  endDate               DateTime? // null for ondemand subscriptions
+  maxAccess             Int // Maximum number of content access allowed
+  accessCount           Int                @default(0) // Current count of content accessed
+  status                SubscriptionStatus @default(ACTIVE)
+  mobileNetworkOperator String
+  aggregator            String
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  transaction           Transaction?       @relation(fields: [transactionId], references: [id])
+  transactionId         String?
+
+  @@index([userId, status])
+  @@index([productId])
+}
+
+// SecureD
+model SecureDDataSync {
+  id           Int                       @id @default(autoincrement())
+  msisdn       String
+  activation   String
+  productId    String
+  description  String
+  timestamp    String
+  trxId        String
+  createdAt    DateTime                  @default(now())
+  auditRecords SubscriptionAuditRecord[]
+
+  @@index([msisdn])
+  @@index([trxId])
+  @@index([productId])
+}
+
+model Marketer {
+  id           String                    @id @default(uuid())
+  name         String
+  prefix       String                    @unique
+  isActive     Boolean                   @default(true)
+  postbackUrl  String?
+  payout       String                    @default("0.25")
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  auditRecords SubscriptionAuditRecord[]
+}
+
+// Add this model to your schema
+model SubscriptionAuditRecord {
+  id String @id @default(uuid())
+
+  // Core event data
+  msisdn        String        @db.VarChar(15)
+  operationType OperationType
+
+  // User identification
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Service identification
+  serviceId String
+  productId String
+
+  // Financial data
+  amountCharged Decimal? @db.Decimal(10, 2)
+
+  // Marketing attribution
+  source     String
+  marketer   Marketer? @relation(fields: [marketerId], references: [id])
+  marketerId String?
+
+  // Business intelligence flags
+  acquired  Boolean @default(false)
+  churned   Boolean @default(false)
+  converted Boolean @default(false)
+
+  // Metadata
+  comment String? @db.VarChar(500)
+
+  // Relationships
+  securedDataSync   SecureDDataSync? @relation(fields: [securedDataSyncId], references: [id], onDelete: Cascade)
+  securedDataSyncId Int?
+
+  icellDataSync   IcellDatasync @relation(fields: [icellDataSyncId], references: [id], onDelete: Cascade)
+  icellDataSyncId Int           @unique
+
+  // Tracking
+  processedAt DateTime @default(now())
+  createdAt   DateTime
+
+  // Indexes
+  @@index([marketerId, acquired])
+  @@index([createdAt, churned])
+  @@index([msisdn])
+  @@index([createdAt])
+  @@index([serviceId])
+  @@index([marketerId])
+  @@index([securedDataSyncId])
+  @@index([icellDataSyncId])
+  @@index([acquired])
+  @@index([churned])
+}
+
+enum TransactionType {
+  SUBSCRIPTION
+  REFUND
+}
+
+model Transaction {
+  id           String          @id @default(uuid())
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  amount       Decimal         @db.Decimal(10, 2)
+  currency     String
+  status       PaymentStatus   @default(PENDING)
+  type         TransactionType @default(SUBSCRIPTION)
+  productId    String
+  productName  String
+  channel      String // e.g., "icell"
+  reference    String
+  subscription Subscription[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([reference])
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  EXHAUSTED
+  FAILED
+  REPLACED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// Quiz
+model QuizSet {
+  id           String         @id @default(uuid())
+  dayId        Int
+  title        String
+  description  String
+  timeLimit    Int?           @default(60) // Time limit in seconds (optional)
+  passingScore Decimal        @default(100.00) @db.Decimal(5, 2) // Passing score percentage
+  religion     Religion?      @relation(fields: [religionId], references: [id])
+  religionId   String?
+  theme        Theme          @relation(fields: [themeId], references: [id])
+  themeId      String
+  isActive     Boolean        @default(true)
+  questions    QuizQuestion[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  attempts     QuizAttempt[]
+}
+
+model QuizQuestion {
+  id              String             @id @default(uuid())
+  quizSet         QuizSet            @relation(fields: [quizSetId], references: [id])
+  quizSetId       String
+  content         String             @db.Text
+  points          Int                @default(1)
+  answerOptions   QuizAnswerOption[]
+  correctAnswerId String? // Will be populated for questions with a single correct answer
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  userAnswers     QuizUserAnswer[]
+  ordering        Int                @default(0) // Position of question in the quiz
+
+  @@index([quizSetId])
+}
+
+model QuizAnswerOption {
+  id          String           @id @default(uuid())
+  question    QuizQuestion     @relation(fields: [questionId], references: [id])
+  questionId  String
+  content     String           @db.Text
+  isCorrect   Boolean          @default(false) // To mark the correct answer option
+  explanation String?          @db.Text // Explanation for why this answer is correct/incorrect
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  userAnswers QuizUserAnswer[]
+
+  @@index([questionId])
+}
+
+model QuizAttempt {
+  id            String           @id @default(uuid())
+  user          User             @relation(fields: [userId], references: [id])
+  userId        String
+  quizSet       QuizSet          @relation(fields: [quizSetId], references: [id])
+  quizSetId     String
+  startedAt     DateTime         @default(now())
+  completedAt   DateTime?
+  score         Decimal          @default(0) @db.Decimal(5, 2)
+  isGraded      Boolean          @default(false)
+  isPassed      Boolean          @default(false)
+  isPublished   Boolean          @default(false)
+  walletHistory WalletHistory[]
+  userAnswers   QuizUserAnswer[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  publishedAt   DateTime?
+
+  @@index([userId, quizSetId])
+}
+
+model QuizUserAnswer {
+  id             String           @id @default(uuid())
+  user           User             @relation(fields: [userId], references: [id])
+  userId         String
+  attempt        QuizAttempt      @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attemptId      String
+  question       QuizQuestion     @relation(fields: [questionId], references: [id])
+  questionId     String
+  answerOption   QuizAnswerOption @relation(fields: [answerOptionId], references: [id])
+  answerOptionId String
+  isCorrect      Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId, questionId])
+}
+
+// Wallet and Banking
+model Wallet {
+  id              String              @id @default(uuid())
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String              @unique
+  balance         Decimal             @default(0) @db.Decimal(10, 2)
+  lastUpdated     DateTime            @updatedAt
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  walletHistories WalletHistory[]
+  withdrawals     WithdrawalRequest[]
+
+  @@index([userId])
+}
+
+enum WalletTransactionType {
+  QUIZ_REWARD
+  WITHDRAWAL
+  MANUAL_CREDIT
+  REFUND
+}
+
+model WalletHistory {
+  id              String                @id @default(uuid())
+  wallet          Wallet                @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  walletId        String
+  amount          Decimal               @db.Decimal(10, 2)
+  balanceAfter    Decimal               @db.Decimal(10, 2)
+  balanceBefore   Decimal               @db.Decimal(10, 2)
+  transactionType WalletTransactionType
+  description     String
+  metadata        Json?
+  quizAttempt     QuizAttempt?          @relation(fields: [quizAttemptId], references: [id])
+  quizAttemptId   String?
+  createdAt       DateTime              @default(now())
+
+  @@index([walletId])
+  @@index([quizAttemptId])
+}
+
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model WithdrawalRequest {
+  id             String           @id @default(uuid())
+  wallet         Wallet           @relation(fields: [walletId], references: [id])
+  walletId       String
+  bankAccount    BankAccount      @relation(fields: [bankAccountId], references: [id])
+  bankAccountId  String
+  amount         Decimal          @db.Decimal(10, 2)
+  reference      String           @unique
+  nibssSessionId String?
+  status         WithdrawalStatus @default(PENDING)
+  apiResponse    Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([walletId])
+  @@index([bankAccountId])
+  @@index([reference])
+}
+
+model BankAccount {
+  id                 String              @id @default(uuid())
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String
+  accountNumber      String
+  accountName        String
+  bankName           String
+  bankCode           String // Store the routing/bank code needed for API
+  isDefault          Boolean             @default(false)
+  isVerified         Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  withdrawalRequests WithdrawalRequest[]
+
+  @@unique([userId, accountNumber])
+  @@index([userId])
+  @@index([accountNumber])
+}

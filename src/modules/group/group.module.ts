@@ -1,0 +1,13 @@
+import { Module } from '@nestjs/common';
+import { GroupController } from './group.controller';
+import { GroupService } from './group.service';
+import { ResponseUtilsService } from '../utils';
+import { S3StorageService } from 'src/common/services/s3-storage/s3-storage.service';
+import { DatabaseServicesModule } from 'src/common/services/database/database.module';
+
+@Module({
+  imports: [DatabaseServicesModule],
+  controllers: [GroupController],
+  providers: [GroupService, ResponseUtilsService, S3StorageService],
+})
+export class GroupModule {}

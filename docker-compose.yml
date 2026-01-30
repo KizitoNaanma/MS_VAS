@@ -1,0 +1,21 @@
+version: '3.8'
+
+volumes:
+  redis_data:
+
+services:
+  nestjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: religious-notifs-app
+    ports:
+      - 4000:4000
+    env_file:
+      - .env.production
+    environment:
+      - REDIS_USERNAME=${REDIS_USERNAME}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_TLS=${REDIS_TLS}

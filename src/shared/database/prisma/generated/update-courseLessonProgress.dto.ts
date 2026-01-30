@@ -1,0 +1,32 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDateString, IsOptional } from 'class-validator';
+
+export class UpdateCourseLessonProgressDto {
+  @ApiProperty({
+    type: 'string',
+    format: 'date-time',
+    required: false,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsDateString()
+  startedAt?: Date | null;
+  @ApiProperty({
+    type: 'string',
+    format: 'date-time',
+    required: false,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsDateString()
+  completedAt?: Date | null;
+  @ApiProperty({
+    type: 'string',
+    format: 'date-time',
+    required: false,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsDateString()
+  lastAccessedAt?: Date | null;
+}
