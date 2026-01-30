@@ -13,15 +13,11 @@ services:
           name: religious-db
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          type: redis
-          name: religious-redis
-          property: connectionString
+        sync: false
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: JWT_REFRESH_SECRET_KEY
         generateValue: true
-      # Add other env vars manually in Render dashboard for security
       - key: NO_REPLY_USER_EMAIL
         sync: false
       - key: NO_REPLY_USER_PASSWORD
@@ -29,8 +25,4 @@ services:
 
 databases:
   - name: religious-db
-    plan: free
-
-redis:
-  - name: religious-redis
     plan: free
