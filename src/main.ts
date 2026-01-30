@@ -48,20 +48,28 @@ async function bootstrap() {
       }),
     );
     app.enableCors({
-      origin: CORS_ORIGINS,
+      origin: '*',
       credentials: true,
     });
     app.use(cookieParser());
     app.enableShutdownHooks();
 
-    const config = new DocumentBuilder()
+    const swaggerConfig = new DocumentBuilder()
       .setTitle('Religious Notifications API')
       .setDescription('API for Religious Notifications')
-      .addServer(`http://localhost:${PORT}`, 'Local environment')
-      .addServer(STAGING_SERVER_URL, 'Staging environment')
       .setVersion('1.0')
       .addTag('Religious Notifications')
-      .addBearerAuth()
+      .addBearerAuth();
+
+    // Prioritize Staging/Render URL if available
+    if (STAGING_SERVER_URL) {
+      swaggerConfig.addServer(STAGING_SERVER_URL, 'Staging environment');
+    }
+
+    // Always keep localhost for local development
+    swaggerConfig.addServer(`http://localhost:${PORT}`, 'Local environment');
+
+    const config = swaggerConfig
       .addGlobalParameters({
         in: 'header',
         required: false,
