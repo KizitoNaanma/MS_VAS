@@ -7,8 +7,9 @@ import { MindfulnessResourcesAdminService } from './admin/mindfulness-resource-a
 import { MindfulnessResourcesController } from './admin/mindfulness-resource-admin.controller';
 import { DatabaseServicesModule } from 'src/common/services/database/database.module';
 
+import { IcellCoreModule } from 'src/shared/icell-core/icell-core.module';
 @Module({
-  imports: [DatabaseServicesModule],
+  imports: [DatabaseServicesModule, IcellCoreModule],
   providers: [
     MindfulnessResourceService,
     ResponseUtilsService,

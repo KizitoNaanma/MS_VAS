@@ -420,7 +420,7 @@ export class AuthService {
 
   async signIn(
     payload: LoginDto,
-    xPlatformReligion: string,
+    xPlatformReligion?: string,
   ): Promise<IServiceResponse> {
     const { email, password, phone } = payload;
 
@@ -438,12 +438,6 @@ export class AuthService {
       };
     }
 
-    if (!xPlatformReligion) {
-      return {
-        success: false,
-        message: 'Platform religion is required.',
-      };
-    }
 
     const where: Prisma.UserWhereInput = {
       ...(email && { email }),

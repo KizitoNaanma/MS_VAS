@@ -9,8 +9,9 @@ import {
 import { AdminDevotionalsController } from './admin/devotionals.controller';
 import { AdminDevotionalsService } from './admin/devotionals.service';
 import { DatabaseServicesModule } from 'src/common/services/database/database.module';
+import { IcellCoreModule } from 'src/shared/icell-core/icell-core.module';
 @Module({
-  imports: [DatabaseServicesModule],
+  imports: [DatabaseServicesModule, IcellCoreModule],
   providers: [
     DevotionalService,
     ResponseUtilsService,

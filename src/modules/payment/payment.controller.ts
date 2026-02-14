@@ -7,7 +7,11 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
-import { AuthorizationRequired } from 'src/common/decorators/auth.decorator';
+import {
+  ApiErrorDecorator,
+  AuthorizationRequired,
+  CurrentUser,
+} from 'src/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,

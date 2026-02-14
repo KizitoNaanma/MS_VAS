@@ -10,8 +10,9 @@ import { AdminScripturesService } from './admin/scriptures.service';
 import { AdminScripturesController } from './admin/scriptures.controller';
 import { DatabaseServicesModule } from 'src/common/services/database/database.module';
 
+import { IcellCoreModule } from 'src/shared/icell-core/icell-core.module';
 @Module({
-  imports: [DatabaseServicesModule],
+  imports: [DatabaseServicesModule, IcellCoreModule],
   providers: [
     ScriptureService,
     ResponseUtilsService,

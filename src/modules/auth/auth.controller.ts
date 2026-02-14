@@ -5,7 +5,6 @@ import {
   HttpStatus,
   Post,
   Query,
-  Req,
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -47,7 +46,6 @@ import {
 import { ResponseUtilsService } from '../utils';
 import { UserEntity } from 'src/shared/database/prisma/generated/user.entity';
 import { Response } from 'express';
-import { PLATFORM_RELIGION_HEADER } from 'src/common/services/guards/religion.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -121,15 +119,11 @@ export class AuthController {
   @ApiErrorDecorator(HttpStatus.BAD_REQUEST, 'Login failed')
   @Post('/sign-in')
   async signIn(
-    @Req() req: Request,
     @Body() payload: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { headers } = req;
-    const xPlatformReligion: string = headers[PLATFORM_RELIGION_HEADER];
     const serviceResponse: IServiceResponse = await this.services.signIn(
       payload,
-      xPlatformReligion,
     );
 
     let response: IResponse;
