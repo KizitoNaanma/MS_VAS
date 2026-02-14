@@ -63,7 +63,7 @@ const redisClient = createClient({
           host: String(REDIS_HOST),
           port: Number(REDIS_PORT),
         }),
-    tls: REDIS_TLS === 'true',
+    tls: String(REDIS_TLS) === 'true',
     rejectUnauthorized: false,
     reconnectStrategy(retries, cause) {
       if (cause) {

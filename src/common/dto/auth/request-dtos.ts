@@ -15,24 +15,27 @@ import { ReligionEnum } from 'src/common/enum';
 export class SignUpDto {
   @ApiProperty({
     type: 'string',
+    required: false,
   })
   @IsString()
-  @IsNotEmpty()
-  public readonly firstName: string;
+  @IsOptional()
+  public readonly firstName?: string;
 
   @ApiProperty({
     type: 'string',
+    required: false,
   })
   @IsString()
-  @IsNotEmpty()
-  public readonly lastName: string;
+  @IsOptional()
+  public readonly lastName?: string;
 
   @ApiProperty({
     type: 'string',
+    required: false,
   })
   @IsEmail()
   @IsOptional()
-  public readonly email: string;
+  public readonly email?: string;
 
   @ApiProperty({
     type: 'string',
@@ -40,26 +43,6 @@ export class SignUpDto {
   @IsPhoneNumber('NG')
   @IsNotEmpty()
   public readonly phone: string;
-
-  // @ApiProperty({
-  //   type: 'string',
-  // })
-  // @IsString()
-  // @IsNotEmpty()
-  // @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-  //   message:
-  //     'Password must contain at least one uppercase letter, one lowercase letter, a number and a special character',
-  // })
-  // public readonly password: string;
-
-  @ApiProperty({
-    enum: ReligionEnum,
-  })
-  @IsNotEmpty()
-  @IsEnum(ReligionEnum, {
-    message: `Valid options for religion are ${Object.values(ReligionEnum)}`,
-  })
-  public readonly religion: ReligionEnum;
 }
 
 export class VerifyAccountDto {

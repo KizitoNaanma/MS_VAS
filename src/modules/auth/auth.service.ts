@@ -77,7 +77,7 @@ export class AuthService {
   }
 
   async signUp(payload: ISignUp): Promise<IServiceResponse> {
-    const { firstName, lastName, email, phone, religion } = payload;
+    const { firstName, lastName, email, phone } = payload;
 
     try {
       const existingUser = await this.prisma.user.findUnique({
@@ -98,21 +98,21 @@ export class AuthService {
         };
       }
 
-      const fullName = `${firstName} ${lastName}`;
+      const fullName = firstName && lastName ? `${firstName} ${lastName}` : '';
       const password = this.generatePassword();
       const passwordHash = await this.encryption.hash(password);
 
       // create a user
       const user = await this.prisma.user.create({
         data: {
-          firstName,
-          lastName,
+          firstName: firstName || '',
+          lastName: lastName || '',
           fullName,
-          email,
+          email: email || null,
           phone,
           passwordHash,
-          religion: religion || null,
-          signUpType: email ? SignUpTypeEnum.EMAIL : SignUpTypeEnum.PHONE,
+          religion: null,
+          signUpType: phone ? SignUpTypeEnum.PHONE : SignUpTypeEnum.EMAIL,
           roles: [UserRole.USER],
         },
       });
@@ -147,11 +147,9 @@ export class AuthService {
       return {
         success: true,
         message: responseMessage,
-        data: env.isProd
-          ? null
-          : {
-              code: otpCode,
-            },
+        data: {
+          code: otpCode,
+        },
       };
     } catch (error) {
       return {
@@ -244,11 +242,9 @@ export class AuthService {
     return {
       success: true,
       message: 'Verification code sent successfully',
-      data: env.isProd
-        ? {}
-        : {
-            code: otpCode,
-          },
+      data: {
+        code: otpCode,
+      },
     };
   }
 
@@ -420,7 +416,6 @@ export class AuthService {
 
   async signIn(
     payload: LoginDto,
-    xPlatformReligion?: string,
   ): Promise<IServiceResponse> {
     const { email, password, phone } = payload;
 
@@ -475,17 +470,11 @@ export class AuthService {
       };
     }
 
+    // Check if user is active
     if (!user.isActive) {
       return {
         success: false,
         message: 'User is not active.',
-      };
-    }
-
-    if (user.religion !== xPlatformReligion) {
-      return {
-        success: false,
-        message: 'User religion does not match platform religion.',
       };
     }
 
@@ -547,7 +536,7 @@ export class AuthService {
       return {
         success: true,
         message: 'Verification code sent successfully',
-        data: env.isProd ? {} : { code: otpCode },
+        data: { code: otpCode },
       };
     }
 
@@ -690,7 +679,7 @@ export class AuthService {
     return {
       success: true,
       message: 'Sent successfully',
-      data: env.isProd ? {} : { code: otpCode },
+      data: { code: otpCode },
     };
   }
 

@@ -30,11 +30,13 @@ const redisConfig: RedisClientOptions<
     }
   }),
   socket: {
-    ...(REDIS_URL ? {} : {
-      host: String(REDIS_HOST),
-      port: Number(REDIS_PORT),
-    }),
-    tls: REDIS_TLS === 'true',
+    ...(REDIS_URL
+      ? {}
+      : {
+          host: String(REDIS_HOST),
+          port: Number(REDIS_PORT),
+        }),
+    tls: String(REDIS_TLS) === 'true',
     rejectUnauthorized: false,
     reconnectStrategy(retries, cause) {
       if (cause) {
