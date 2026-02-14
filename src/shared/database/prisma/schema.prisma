@@ -107,8 +107,19 @@ model User {
   wallet                  Wallet?
   bankAccounts            BankAccount[]
   SubscriptionAuditRecord SubscriptionAuditRecord[]
+  wheelSpins              WheelSpin[]
 
   @@index(fields: [email, phone])
+}
+
+model WheelSpin {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  amountWon  Decimal  @db.Decimal(10, 2)
+  isWin      Boolean
+  rewardType String? // e.g., "CASH", "AIRTIME"
+  spunAt     DateTime @default(now())
 }
 
 model Webhooks {
@@ -788,6 +799,7 @@ enum WalletTransactionType {
   WITHDRAWAL
   MANUAL_CREDIT
   REFUND
+  WHEEL_REWARD
 }
 
 model WalletHistory {

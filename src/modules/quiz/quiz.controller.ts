@@ -19,7 +19,6 @@ import {
   AuthorizationRequired,
   CurrentUser,
   PageOptionsDto,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { CurrentUserReligionInterceptor } from 'src/common/interceptors/current-user-religion.interceptor';
@@ -43,7 +42,6 @@ import { SubscriptionAccessInterceptor } from 'src/common/interceptors/subscript
 @ApiTags('Quizzes')
 @Controller('quizzes')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 @UseInterceptors(CurrentUserReligionInterceptor)

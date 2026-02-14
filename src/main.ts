@@ -70,20 +70,6 @@ async function bootstrap() {
     swaggerConfig.addServer(`http://localhost:${PORT}`, 'Local environment');
 
     const config = swaggerConfig
-      .addGlobalParameters({
-        in: 'header',
-        required: false,
-        name: 'x-platform-religion',
-        description: 'The religion of the platform',
-        examples: {
-          Christianity: {
-            value: 'christianity',
-          },
-          Islam: {
-            value: 'islam',
-          },
-        },
-      })
       .build();
 
     const customOptions: SwaggerCustomOptions = {

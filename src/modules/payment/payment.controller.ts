@@ -14,7 +14,6 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ApiErrorDecorator, CurrentUser, ReligionMustMatch } from 'src/common';
 
 import { Response } from 'express';
 
@@ -47,7 +46,6 @@ export class PaymentController {
   @ApiErrorDecorator(HttpStatus.NOT_FOUND, 'Banks not found')
   @ApiBearerAuth()
   @AuthorizationRequired()
-  @ReligionMustMatch()
   async getBanks(@Res() res: Response) {
     const serviceResponse = await this.paymentService.getBanks();
     return this.response.sendResponse(res, serviceResponse);
@@ -63,7 +61,6 @@ export class PaymentController {
   )
   @ApiBearerAuth()
   @AuthorizationRequired()
-  @ReligionMustMatch()
   async createWithdrawalRequest(
     @CurrentUser() user: UserEntity,
     @Res() res: Response,

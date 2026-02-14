@@ -14,7 +14,6 @@ import {
   IGetChapter,
   IGetVerse,
   IResponse,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { Response } from 'express';
@@ -30,7 +29,6 @@ import {
 @ApiTags('Bible')
 @Controller('bible')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 export class BibleController {

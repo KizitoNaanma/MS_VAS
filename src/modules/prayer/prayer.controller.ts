@@ -21,7 +21,6 @@ import { DailyPrayerResponseDto } from 'src/common/dto/prayer';
 import {
   ApiErrorDecorator,
   AuthorizationRequired,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { CurrentUserReligionInterceptor } from 'src/common/interceptors/current-user-religion.interceptor';
@@ -31,7 +30,6 @@ import { Response } from 'express';
 @ApiTags('Prayers')
 @Controller('prayers')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 @UseInterceptors(CurrentUserReligionInterceptor)

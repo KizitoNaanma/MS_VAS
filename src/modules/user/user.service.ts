@@ -6,6 +6,7 @@ import {
   IGetProfile,
   IToggleNotificationPreferences,
   IUserReligion,
+  ReligionEnum,
   SMTP_NO_REPLY_USER_EMAIL,
   SMTP_FROM_NAME,
   IServiceResponse,
@@ -23,7 +24,7 @@ import { AuthService } from '../auth/auth.service';
 
 interface UserLookupConfig {
   operation: 'get-only' | 'get-or-create';
-  religion?: string;
+  religion?: string | ReligionEnum;
   authMethod?: PhoneAuthMethodEnum;
 }
 
@@ -175,12 +176,8 @@ export class UserService {
       return null;
     }
 
-    // For 'get-or-create' operation, religion is required when creating a new user
-    if (!config.religion) {
-      throw new Error('Religion is required for user creation');
-    }
-
-    const religionEnum = getReligionEnum(config.religion);
+    // For 'get-or-create' operation, religion is optional
+    const religionEnum = config.religion ? getReligionEnum(config.religion) : null;
     const authMethod = config.authMethod || PhoneAuthMethodEnum.MAGIC_LINK;
 
     const result = await this.authService.signUpWithPhoneNumber(

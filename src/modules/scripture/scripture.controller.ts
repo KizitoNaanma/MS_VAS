@@ -16,7 +16,6 @@ import {
 import {
   ApiErrorDecorator,
   AuthorizationRequired,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { CurrentUserReligionInterceptor } from 'src/common/interceptors/current-user-religion.interceptor';
@@ -31,7 +30,6 @@ import { Response } from 'express';
 @ApiTags('Scriptures')
 @Controller('scriptures')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 @UseInterceptors(CurrentUserReligionInterceptor)

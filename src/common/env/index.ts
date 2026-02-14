@@ -97,6 +97,7 @@ export const ISLAMIC_PORTAL_URL =
 export const CHRISTIAN_PORTAL_URL = configService.getOrThrow(
   'CHRISTIAN_PORTAL_URL',
 );
+export const WHEEL_PORTAL_URL = configService.get('WHEEL_PORTAL_URL');
 
 // Admins
 // export const SUPERADMIN_EMAILS: string[] = configService.get('SUPERADMIN_EMAILS')?.split(',').map((email) => email.trim());

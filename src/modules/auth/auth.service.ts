@@ -111,7 +111,7 @@ export class AuthService {
           email,
           phone,
           passwordHash,
-          religion,
+          religion: religion || null,
           signUpType: email ? SignUpTypeEnum.EMAIL : SignUpTypeEnum.PHONE,
           roles: [UserRole.USER],
         },
@@ -163,7 +163,7 @@ export class AuthService {
 
   async signUpWithPhoneNumber(
     phoneNumber: string,
-    religion: ReligionEnum,
+    religion: ReligionEnum | null = null,
     authMethod: PhoneAuthMethodEnum = PhoneAuthMethodEnum.MAGIC_LINK,
   ): Promise<{
     user: UserEntity;

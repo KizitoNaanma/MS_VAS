@@ -6,7 +6,6 @@ import {
   GetSurahDtoResponse,
   GetSurahsDtoResponse,
   IResponse,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { Response } from 'express';
@@ -21,7 +20,6 @@ import {
 @ApiTags('Quran')
 @Controller('quran')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 export class QuranController {

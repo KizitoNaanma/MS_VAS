@@ -9,7 +9,6 @@ import {
 import {
   ApiErrorDecorator,
   AuthorizationRequired,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { ResponseUtilsService } from 'src/modules/utils';
@@ -20,7 +19,6 @@ import { QuizWinningsNotificationResponseDto } from 'src/common/dto/notification
 @ApiTags('Notifications')
 @Controller('notification')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 export class NotificationController {

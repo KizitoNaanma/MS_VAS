@@ -23,3 +23,4 @@ export { QuizModule } from './quiz/quiz.module';
 export { PaymentModule } from './payment/payment.module';
 export { SecureDModule } from './secure-d/secure-d.module';
 export { SubscriptionModule } from './subscription/subscription.module';
+export { WheelOfFortuneModule } from './wheel-of-fortune/wheel-of-fortune.module';

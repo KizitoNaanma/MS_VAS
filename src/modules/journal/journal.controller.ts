@@ -20,7 +20,6 @@ import {
   ApiErrorDecorator,
   AuthorizationRequired,
   CurrentUser,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { UserEntity } from 'src/shared/database/prisma/generated/user.entity';
@@ -31,7 +30,6 @@ import { Response } from 'express';
 @ApiTags('Journals')
 @Controller('journals')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 export class JournalController {

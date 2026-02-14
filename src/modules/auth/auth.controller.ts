@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   HttpStatus,
-  Patch,
   Post,
   Query,
   Req,
@@ -93,7 +92,7 @@ export class AuthController {
     type: VerifyAccountResponseDto,
   })
   @ApiErrorDecorator(HttpStatus.BAD_REQUEST, 'Verifying account failed')
-  @Patch('/verify-account')
+  @Post('/verify-account')
   async verifyAccount(@Body() body: VerifyAccountDto, @Res() res: Response) {
     const payload: IVerifyAccount = { ...body };
     const serviceResponse = await this.services.verifyAccount(payload);

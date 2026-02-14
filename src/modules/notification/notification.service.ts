@@ -7,6 +7,8 @@ import {
   ReligionEnum,
   CHRISTIAN_PORTAL_URL,
   ISLAMIC_PORTAL_URL,
+  WHEEL_PORTAL_URL,
+  STAGING_SERVER_URL,
   ICELL_SERVICE_CODE,
 } from 'src/common';
 import { OutgoingSmsPayloadDto } from 'src/common/dto/icell';
@@ -158,18 +160,19 @@ export class NotificationService {
     product: IcellProductType,
     msisdn: string,
     token: string,
-    religion: ReligionEnum,
+    religion: ReligionEnum | null,
     config: { type: 'subscription' | 'renewal' },
   ): Promise<void> {
     try {
-      // Determine portal URL based on religion
       let portalUrl: string;
       if (religion === ReligionEnum.CHRISTIANITY) {
         portalUrl = CHRISTIAN_PORTAL_URL;
       } else if (religion === ReligionEnum.ISLAM) {
         portalUrl = ISLAMIC_PORTAL_URL;
       } else {
-        throw new Error(`Invalid religion: ${religion}`);
+        // Use generic or staging portal URL if no religion specified
+        // This covers games like Wheel of Fortune
+        portalUrl = WHEEL_PORTAL_URL || STAGING_SERVER_URL;
       }
 
       // Construct magic link URL

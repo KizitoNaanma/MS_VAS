@@ -16,7 +16,6 @@ import {
   ApiErrorDecorator,
   AuthorizationRequired,
   CurrentUser,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { ResponseUtilsService } from '../utils';
@@ -31,7 +30,6 @@ import { Religion } from '@prisma/client';
 @ApiTags('Subscription')
 @Controller('subscription')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 @UseInterceptors(CurrentUserReligionInterceptor)

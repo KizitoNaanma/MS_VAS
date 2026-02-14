@@ -21,7 +21,6 @@ import {
   ApiErrorDecorator,
   AuthorizationRequired,
   GetCurrentUser,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { CurrentUserReligionInterceptor } from 'src/common/interceptors/current-user-religion.interceptor';
@@ -41,7 +40,6 @@ import { SubscriptionAccessInterceptor } from 'src/common/interceptors/subscript
 @ApiBearerAuth()
 @ApiTags('Music-library')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 @Controller('music-library')

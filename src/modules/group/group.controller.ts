@@ -25,8 +25,8 @@ import {
   ApiErrorDecorator,
   AuthorizationRequired,
   CurrentUser,
+  CurrentUserReligion,
   PageOptionsDto,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { CurrentUserReligionInterceptor } from 'src/common/interceptors/current-user-religion.interceptor';
@@ -43,6 +43,7 @@ import {
 import { ResponseUtilsService } from '../utils';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { Religion } from '@prisma/client';
 import { UpdateGroupDto } from 'src/shared/database/prisma/generated/update-group.dto';
 import { ApiStandardSuccessDecorator } from 'src/common/decorators/api-standard-success.decorator';
 
@@ -50,7 +51,6 @@ import { ApiStandardSuccessDecorator } from 'src/common/decorators/api-standard-
 @ApiBearerAuth()
 @ApiTags('Groups')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 @UseInterceptors(CurrentUserReligionInterceptor)
@@ -69,9 +69,14 @@ export class GroupController {
   async createGroup(
     @Body() data: CreateGroupDto,
     @CurrentUser() user: UserEntity,
+    @CurrentUserReligion() religion: Religion,
     @Res() res: Response,
   ) {
-    const serviceResponse = await this.groupService.createGroup(user, data);
+    const serviceResponse = await this.groupService.createGroup(
+      user,
+      religion,
+      data,
+    );
     return this.response.sendResponse(res, serviceResponse);
   }
 
@@ -118,12 +123,14 @@ export class GroupController {
   })
   async getGroups(
     @CurrentUser() user: UserEntity,
+    @CurrentUserReligion() religion: Religion,
     @Res() res: Response,
     @Query('owner') owner?: 'me' | 'others',
     @Query('joined') joined?: 'true' | 'false',
   ) {
     const serviceResponse = await this.groupService.getGroups(
       user,
+      religion,
       owner,
       joined,
     );
@@ -137,11 +144,14 @@ export class GroupController {
     type: [SimpleGroupResponseDto],
   })
   async searchGroups(
-    @CurrentUser() user: UserEntity,
+    @CurrentUserReligion() religion: Religion,
     @Query('query') query: string,
     @Res() res: Response,
   ) {
-    const serviceResponse = await this.groupService.searchGroups(user, query);
+    const serviceResponse = await this.groupService.searchGroups(
+      religion,
+      query,
+    );
     return this.response.sendResponse(res, serviceResponse);
   }
 

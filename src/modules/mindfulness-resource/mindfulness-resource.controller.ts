@@ -11,7 +11,6 @@ import { MindfulnessResourceService } from './mindfulness-resource.service';
 import {
   ApiErrorDecorator,
   AuthorizationRequired,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import {
@@ -35,7 +34,6 @@ import { SubscriptionAccessInterceptor } from 'src/common/interceptors/subscript
 @ApiTags('Mindfulness-resources')
 @Controller('mindfulness-resources')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 @UseInterceptors(CurrentUserReligionInterceptor)

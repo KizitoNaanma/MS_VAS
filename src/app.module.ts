@@ -32,12 +32,13 @@ import {
   PaymentModule,
   SecureDModule,
   SubscriptionModule,
+  WheelOfFortuneModule,
 } from './modules';
 
 import { CommonModule } from './common/common.module';
 import { winstonConfig } from './modules/utils/logger/winston.config';
 import { env } from './common';
-import { ReligionGuard } from './common/services/guards/religion.guard';
+import { SubscriptionGuard } from './common/services/guards/subscription.guard';
 import { RequiresAdminRole } from './common/services/guards/admin-role.guard';
 
 // Create base imports array
@@ -65,6 +66,7 @@ const baseImports = [
   PaymentModule,
   SecureDModule,
   SubscriptionModule,
+  WheelOfFortuneModule,
   WinstonModule.forRoot(winstonConfig),
   CommonModule, // Global
   EventEmitterModule.forRoot(),
@@ -80,14 +82,14 @@ if (env.isDev) {
   imports: baseImports,
   controllers: [AppController],
   providers: [
-    // With this order, the ReligionGuard will be applied after the AuthenticationGuard
+    // With this order, the SubscriptionGuard will be applied after the AuthenticationGuard
     {
       provide: APP_GUARD,
       useClass: AuthenticationGuard,
     },
     {
       provide: APP_GUARD,
-      useClass: ReligionGuard,
+      useClass: SubscriptionGuard,
     },
     {
       provide: APP_GUARD,

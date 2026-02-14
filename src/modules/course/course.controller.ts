@@ -24,9 +24,7 @@ import {
   LessonCompletionResponseDto,
   CourseCategoryResponseDto,
   CourseResponseDto,
-  CurrentUser,
   CourseLessonDetailsResponseDto,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import {
@@ -40,7 +38,6 @@ import { ApiErrorDecorator } from 'src/common';
 import { CurrentUserReligionInterceptor } from 'src/common/interceptors/current-user-religion.interceptor';
 import { CurrentUserReligion } from 'src/common/decorators/current-user-religion.decorator';
 import { Religion } from '@prisma/client';
-import { UserEntity } from 'src/shared/database/prisma/generated/user.entity';
 import { Response } from 'express';
 import { SubscriptionAccessInterceptor } from 'src/common/interceptors/subscription-access.interceptor';
 
@@ -48,7 +45,6 @@ import { SubscriptionAccessInterceptor } from 'src/common/interceptors/subscript
 @ApiTags('Courses')
 @Controller('courses')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 @UseInterceptors(CurrentUserReligionInterceptor)
@@ -118,7 +114,7 @@ export class CourseController {
     type: [CourseResponseDto],
   })
   async searchCourses(
-    @CurrentUser() user: UserEntity,
+    @CurrentUserReligion() religion: Religion,
     @Query('query') query: string,
     @Res() res: Response,
   ) {
@@ -140,7 +136,10 @@ export class CourseController {
         },
       );
     }
-    const serviceResponse = await this.courseService.searchCourses(user, query);
+    const serviceResponse = await this.courseService.searchCourses(
+      religion,
+      query,
+    );
     return this.response.sendResponse(res, serviceResponse);
   }
 

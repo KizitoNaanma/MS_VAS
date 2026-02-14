@@ -19,7 +19,6 @@ import {
   ProgressStatsDto,
 } from 'src/common';
 import { PrismaService } from 'src/common/services/database/prisma';
-import { UserEntity } from 'src/shared/database/prisma/generated/user.entity';
 import { getS3FileUrl } from '../utils';
 
 @Injectable()
@@ -63,16 +62,10 @@ export class CourseService {
   }
 
   async searchCourses(
-    user: UserEntity,
+    religion: Religion,
     query: string,
   ): Promise<IServiceResponse<CourseResponseDto[]>> {
     const searchKeywords = query.trim().split(' ').join(' | ');
-
-    const religion = await this.prismaService.religion.findFirst({
-      where: {
-        code: user.religion,
-      },
-    });
 
     const courses = await this.prismaService.$queryRaw<Course[]>(
       Prisma.sql`SELECT 

@@ -30,7 +30,6 @@ import {
   CurrentUser,
   IUpdatePassword,
   UpdateUserProfilePhotoDto,
-  ReligionMustMatch,
   UserAvailableQuizAttemptsResponseDto,
 } from 'src/common';
 import {
@@ -57,7 +56,6 @@ import { SimpleBankAccountDto } from 'src/common/dto/bank-account';
 @ApiTags('User')
 @Controller('user')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @AuthorizationRequired()
 export class UserController {
   constructor(

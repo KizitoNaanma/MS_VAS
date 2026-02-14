@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Group, Prisma } from '@prisma/client';
+import { Group, Prisma, Religion } from '@prisma/client';
 import {
   IServiceResponse,
   PageDto,
@@ -38,13 +38,9 @@ export class GroupService {
 
   async createGroup(
     user: UserEntity,
+    religion: Religion,
     data: CreateGroupDto,
   ): Promise<IServiceResponse<SimpleGroupResponseDto>> {
-    const religion = await this.prismaService.religion.findFirst({
-      where: {
-        code: user.religion,
-      },
-    });
 
     if (!religion) {
       throw new BadRequestException('Religion not found');
@@ -128,19 +124,11 @@ export class GroupService {
 
   async getGroups(
     user: UserEntity,
+    religion: Religion,
     owner?: 'me' | 'others',
     joined?: 'true' | 'false',
   ): Promise<IServiceResponse<SimpleGroupResponseDto[]>> {
     const hasJoined = joined === 'true';
-    const religion = await this.prismaService.religion.findFirst({
-      where: {
-        code: user.religion,
-      },
-    });
-
-    if (!religion) {
-      throw new BadRequestException('Religion not found');
-    }
 
     let userGroups = [];
     const groups = await this.prismaService.group.findMany({
@@ -178,16 +166,10 @@ export class GroupService {
   }
 
   async searchGroups(
-    user: UserEntity,
+    religion: Religion,
     query: string,
   ): Promise<IServiceResponse<SimpleGroupResponseDto[]>> {
     const searchKeywords = query.trim().split(' ').join(' | ');
-
-    const religion = await this.prismaService.religion.findFirst({
-      where: {
-        code: user.religion,
-      },
-    });
 
     const groups = await this.prismaService.$queryRaw<Group[]>(
       Prisma.sql`SELECT * FROM "Group" WHERE

@@ -12,8 +12,9 @@ export interface IcellProductType {
 export interface IcellServiceType {
   id: string;
   name: string;
-  type: 'subscription' | 'ondemand';
-  religion: string;
+  type: 'subscription' | 'ondemand' | 'game';
+  religion?: string;
+  service?: string;
   products: IcellProductType[];
 }
 

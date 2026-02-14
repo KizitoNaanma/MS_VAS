@@ -10,8 +10,12 @@
         "name": "RELIGIOUS NOTIFICATION_Daily_Christian",
         "price": 200,
         "currency": "NGN",
-        "optInKeywords": ["GLORY"],
-        "optOutKeywords": ["STOP GLORY"],
+        "optInKeywords": [
+          "GLORY"
+        ],
+        "optOutKeywords": [
+          "STOP GLORY"
+        ],
         "validityDays": "1",
         "maxAccess": "unlimited"
       },
@@ -20,8 +24,12 @@
         "name": "RELIGIOUS NOTIFICATION_Weekly_Christian",
         "price": 300,
         "currency": "NGN",
-        "optInKeywords": ["CW"],
-        "optOutKeywords": ["Unsubscribe CW"],
+        "optInKeywords": [
+          "CW"
+        ],
+        "optOutKeywords": [
+          "Unsubscribe CW"
+        ],
         "validityDays": "7",
         "maxAccess": "unlimited"
       },
@@ -30,8 +38,12 @@
         "name": "RELIGIOUS NOTIFICATION_Monthly_Christian",
         "price": 500,
         "currency": "NGN",
-        "optInKeywords": ["CM"],
-        "optOutKeywords": ["STOP CM"],
+        "optInKeywords": [
+          "CM"
+        ],
+        "optOutKeywords": [
+          "STOP CM"
+        ],
         "validityDays": "30",
         "maxAccess": "unlimited"
       }
@@ -48,8 +60,12 @@
         "name": "RELIGIOUS NOTIFICATION_Daily_Islam",
         "price": 200,
         "currency": "NGN",
-        "optInKeywords": ["NUR"],
-        "optOutKeywords": ["STOP NUR"],
+        "optInKeywords": [
+          "NUR"
+        ],
+        "optOutKeywords": [
+          "STOP NUR"
+        ],
         "validityDays": "1",
         "maxAccess": "unlimited"
       },
@@ -58,8 +74,12 @@
         "name": "RELIGIOUS NOTIFICATION_Weekly_Islam",
         "price": 300,
         "currency": "NGN",
-        "optInKeywords": ["IW"],
-        "optOutKeywords": ["STOP IW"],
+        "optInKeywords": [
+          "IW"
+        ],
+        "optOutKeywords": [
+          "STOP IW"
+        ],
         "validityDays": "7",
         "maxAccess": "unlimited"
       },
@@ -68,9 +88,35 @@
         "name": "RELIGIOUS NOTIFICATION_Monthly_Islam",
         "price": 500,
         "currency": "NGN",
-        "optInKeywords": ["IM"],
-        "optOutKeywords": ["STOP IM"],
+        "optInKeywords": [
+          "IM"
+        ],
+        "optOutKeywords": [
+          "STOP IM"
+        ],
         "validityDays": "30",
+        "maxAccess": "unlimited"
+      }
+    ]
+  },
+  {
+    "id": "WHEEL_SERVICE_ID",
+    "name": "PISI_WHEEL_OF_FORTUNE",
+    "type": "game",
+    "service": "wheel_of_fortune",
+    "products": [
+      {
+        "id": "WHEEL_DAILY_ID",
+        "name": "WHEEL_OF_FORTUNE_Daily",
+        "price": 100,
+        "currency": "NGN",
+        "optInKeywords": [
+          "WHEEL"
+        ],
+        "optOutKeywords": [
+          "STOP WHEEL"
+        ],
+        "validityDays": "1",
         "maxAccess": "unlimited"
       }
     ]

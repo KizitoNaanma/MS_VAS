@@ -18,7 +18,6 @@ import {
 import {
   ApiErrorDecorator,
   AuthorizationRequired,
-  ReligionMustMatch,
   SubscriptionRequired,
 } from 'src/common';
 import { DailyDevotionalResponseDto } from 'src/common/dto/devotional';
@@ -32,7 +31,6 @@ import { SubscriptionAccessInterceptor } from 'src/common/interceptors/subscript
 @ApiTags('Devotionals')
 @Controller('devotionals')
 @ApiErrorDecorator(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-@ReligionMustMatch()
 @SubscriptionRequired()
 @AuthorizationRequired()
 @UseInterceptors(CurrentUserReligionInterceptor)

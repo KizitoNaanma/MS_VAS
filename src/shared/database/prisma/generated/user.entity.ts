@@ -13,6 +13,7 @@ import { QuizUserAnswerEntity } from './quizUserAnswer.entity';
 import { WalletEntity } from './wallet.entity';
 import { BankAccountEntity } from './bankAccount.entity';
 import { SubscriptionAuditRecordEntity } from './subscriptionAuditRecord.entity';
+import { WheelSpinEntity } from './wheelSpin.entity';
 
 export class UserEntity {
   @ApiProperty({
@@ -218,4 +219,10 @@ export class UserEntity {
     required: false,
   })
   SubscriptionAuditRecord?: SubscriptionAuditRecordEntity[];
+  @ApiProperty({
+    type: () => WheelSpinEntity,
+    isArray: true,
+    required: false,
+  })
+  wheelSpins?: WheelSpinEntity[];
 }
