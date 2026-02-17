@@ -96,7 +96,7 @@ export class CompleteOnboardingDto {
 
   @ApiProperty({
     type: 'boolean',
-    description: 'Confirmation that user is 18 years or older',
+    description: 'Confirmation that user is 18 years or older.',
   })
   @IsNotEmpty()
   public readonly ageConfirmed: boolean;
