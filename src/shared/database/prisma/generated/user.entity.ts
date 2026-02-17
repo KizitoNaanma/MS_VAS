@@ -47,16 +47,19 @@ export class UserEntity {
   phone: string | null;
   @ApiProperty({
     type: 'string',
+    nullable: true,
   })
-  firstName: string;
+  firstName: string | null;
   @ApiProperty({
     type: 'string',
+    nullable: true,
   })
-  lastName: string;
+  lastName: string | null;
   @ApiProperty({
     type: 'string',
+    nullable: true,
   })
-  fullName: string;
+  fullName: string | null;
   @ApiProperty({
     type: 'string',
     format: 'date-time',

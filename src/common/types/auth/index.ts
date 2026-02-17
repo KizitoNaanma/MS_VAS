@@ -4,7 +4,7 @@ import {
   ResetPasswordDto,
   SignUpDto,
   VerifyAccountDto,
-  SetupProfileDto,
+  CompleteOnboardingDto,
 } from 'src/common/dto';
 
 export type ISignUp = SignUpDto;
@@ -19,4 +19,4 @@ export type IRefreshToken = {
 
 export type IRequestPasswordResetOtp = RequestPasswordResetOtpDto;
 export type IResetPassword = ResetPasswordDto;
-export type ISetupProfile = SetupProfileDto;
+export type ICompleteOnboarding = CompleteOnboardingDto;

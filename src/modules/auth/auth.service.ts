@@ -1,13 +1,16 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { OAuth2Client } from 'google-auth-library';
 import {
-  GOOGLE_CLIENT_ID,
+  IVerifyAccount,
+  ICompleteOnboarding,
+  ISignUp,
   IGoogleOAuth2,
-  IRefreshToken,
   IRequestPasswordResetOtp,
   IResetPassword,
-  ISignUp,
-  IVerifyAccount,
+  IRefreshToken,
+} from 'src/common/types/auth';
+import {
+  GOOGLE_CLIENT_ID,
   SignUpTypeEnum,
   TokenTypeEnum,
   env,
@@ -17,7 +20,6 @@ import {
   SUPERADMIN_EMAILS,
   ResendOtpDto,
   PhoneAuthMethodEnum,
-  ISetupProfile,
 } from 'src/common';
 import { randomUUID } from 'crypto';
 // import { InMemoryCacheService } from 'src/shared/cache/in-memory-cache/in-memory-cache.service';
@@ -83,18 +85,14 @@ export class AuthService {
     try {
       const existingUser = await this.prisma.user.findUnique({
         where: {
-          ...(email && { email }),
-          ...(phone && { phone }),
+          phone,
         },
       });
 
       if (existingUser) {
-        const responseMessage = email
-          ? 'Email already registered'
-          : 'Phone number already registered';
         return {
           success: false,
-          message: responseMessage,
+          message: 'Phone number already registered',
           data: null,
         };
       }
@@ -106,14 +104,14 @@ export class AuthService {
       // create a user
       const user = await this.prisma.user.create({
         data: {
-          firstName: firstName || '',
-          lastName: lastName || '',
+          firstName,
+          lastName,
           fullName,
-          email: email || null,
+          email,
           phone,
           passwordHash,
           religion: null,
-          signUpType: phone ? SignUpTypeEnum.PHONE : SignUpTypeEnum.EMAIL,
+          signUpType: SignUpTypeEnum.PHONE,
           roles: [UserRole.USER],
         },
       });
@@ -129,7 +127,7 @@ export class AuthService {
       const oneHr = this.time.convertToMilliseconds('hours', 1);
 
       const otpCode = this.string.randomNumbers(6);
-      const cacheKey = this.generateOTPCacheKey(email, phone, 'otp');
+      const cacheKey = this.generateOTPCacheKey(null, phone, 'otp');
       const hashed = await this.encryption.hash(String(otpCode));
 
       await this.cache.set(cacheKey, hashed, oneHr);
@@ -137,17 +135,13 @@ export class AuthService {
       await this.notificationService.sendVerificationCode(
         email,
         phone,
-        fullName,
+        fullName || 'User',
         String(otpCode),
       );
 
-      const responseMessage = email
-        ? 'Please check your email for verification code'
-        : 'Please check your phone for verification code';
-
       return {
         success: true,
-        message: responseMessage,
+        message: 'Please check your phone for verification code',
         data: {
           code: otpCode,
         },
@@ -276,11 +270,10 @@ export class AuthService {
 
     const { id } = await this.prisma.user.update({
       where: {
-        ...(email && { email }),
-        ...(phone && { phone }),
+        phone,
       },
       data: {
-        emailVerified: true,
+        phoneVerified: true,
       },
     });
 
@@ -950,13 +943,13 @@ export class AuthService {
   }
 
   /**
-   * Complete user profile with DOB, PIN and age confirmation
+   * Complete user onboarding with PIN and age confirmation
    */
-  async setupProfile(
+  async completeOnboarding(
     userId: string,
-    payload: ISetupProfile,
+    payload: ICompleteOnboarding,
   ): Promise<IServiceResponse> {
-    const { dob, pin, ageConfirmed } = payload;
+    const { pin, ageConfirmed } = payload;
 
     if (!ageConfirmed) {
       return {
@@ -981,7 +974,6 @@ export class AuthService {
     await this.prisma.user.update({
       where: { id: userId },
       data: {
-        dob: new Date(dob),
         pinHash,
         ageConfirmed: true,
         isProfileComplete: true,

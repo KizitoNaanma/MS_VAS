@@ -22,24 +22,27 @@ export class UpdateUserDto {
   @ApiProperty({
     type: 'string',
     required: false,
+    nullable: true,
   })
   @IsOptional()
   @IsString()
-  firstName?: string;
+  firstName?: string | null;
   @ApiProperty({
     type: 'string',
     required: false,
+    nullable: true,
   })
   @IsOptional()
   @IsString()
-  lastName?: string;
+  lastName?: string | null;
   @ApiProperty({
     type: 'string',
     required: false,
+    nullable: true,
   })
   @IsOptional()
   @IsString()
-  fullName?: string;
+  fullName?: string | null;
   @ApiProperty({
     type: 'string',
     format: 'date-time',

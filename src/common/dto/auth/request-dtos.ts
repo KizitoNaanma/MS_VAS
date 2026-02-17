@@ -13,26 +13,14 @@ import {
 import { ReligionEnum } from 'src/common/enum';
 
 export class SignUpDto {
-  @ApiProperty({
-    type: 'string',
-    required: false,
-  })
   @IsString()
   @IsOptional()
   public readonly firstName?: string;
 
-  @ApiProperty({
-    type: 'string',
-    required: false,
-  })
   @IsString()
   @IsOptional()
   public readonly lastName?: string;
 
-  @ApiProperty({
-    type: 'string',
-    required: false,
-  })
   @IsEmail()
   @IsOptional()
   public readonly email?: string;
@@ -53,28 +41,20 @@ export class VerifyAccountDto {
   @IsNumberString()
   public readonly otp: string;
 
-  @ApiProperty({
-    type: 'string',
-    required: false,
-  })
   @IsEmail()
   @IsOptional()
   public readonly email?: string;
 
   @ApiProperty({
     type: 'string',
-    required: false,
+    description: 'Phone number used for signup',
   })
   @IsString()
-  @IsOptional()
-  public readonly phone?: string;
+  @IsNotEmpty()
+  public readonly phone: string;
 }
 
 export class LoginDto {
-  @ApiProperty({
-    type: 'string',
-    required: false,
-  })
   @IsNotEmpty()
   @IsOptional()
   @IsEmail()
@@ -89,9 +69,6 @@ export class LoginDto {
   @IsString()
   public readonly phone?: string;
 
-  @ApiProperty({
-    type: 'string',
-  })
   @IsOptional()
   @IsString()
   public readonly password?: string;
@@ -107,16 +84,7 @@ export class LoginDto {
   public readonly pin?: string;
 }
 
-export class SetupProfileDto {
-  @ApiProperty({
-    type: 'string',
-    format: 'date',
-    example: '2000-01-01',
-  })
-  @IsNotEmpty()
-  @IsString()
-  public readonly dob: string;
-
+export class CompleteOnboardingDto {
   @ApiProperty({
     type: 'string',
     description: '6-digit PIN for subsequent logins',

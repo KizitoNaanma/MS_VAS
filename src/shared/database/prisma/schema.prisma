@@ -70,9 +70,9 @@ model User {
   email String? @unique @db.Text
   phone String? @unique @db.Text
 
-  firstName    String
-  lastName     String
-  fullName     String
+  firstName    String?
+  lastName     String?
+  fullName     String?
   dob          DateTime?
   religion     String?
   profilePhoto String?

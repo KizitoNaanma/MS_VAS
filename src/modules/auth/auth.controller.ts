@@ -35,7 +35,7 @@ import {
   AuthorizationRequired,
   RefreshTokenResponseDto,
   IResponse,
-  SetupProfileDto,
+  CompleteOnboardingDto,
 } from 'src/common';
 import {
   ApiBearerAuth,
@@ -294,21 +294,21 @@ export class AuthController {
     return this.response.sendResponse(res, serviceResponse);
   }
 
-  @ApiOperation({ summary: 'Setup user profile (DOB, PIN, Age Confirmation)' })
+  @ApiOperation({ summary: 'Complete User Onboarding (PIN, Age Confirmation)' })
   @ApiOkResponse({
-    description: 'Profile setup successful',
+    description: 'Onboarding complete',
   })
-  @ApiErrorDecorator(HttpStatus.BAD_REQUEST, 'Profile setup failed')
+  @ApiErrorDecorator(HttpStatus.BAD_REQUEST, 'Onboarding failed')
   @ApiBearerAuth()
   @AuthorizationRequired()
-  @Post('/setup-profile')
-  async setupProfile(
+  @Post('/complete-onboarding')
+  async completeOnboarding(
     @CurrentUser() user: UserEntity,
-    @Body() body: SetupProfileDto,
+    @Body() body: CompleteOnboardingDto,
     @Res() res: Response,
   ) {
     const { id } = user;
-    const serviceResponse: IServiceResponse = await this.services.setupProfile(
+    const serviceResponse: IServiceResponse = await this.services.completeOnboarding(
       id,
       body,
     );
