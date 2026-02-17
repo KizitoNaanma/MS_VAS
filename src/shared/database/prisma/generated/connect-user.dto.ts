@@ -34,4 +34,12 @@ export class ConnectUserDto {
   @IsOptional()
   @IsString()
   passwordHash?: string;
+  @ApiProperty({
+    type: 'string',
+    required: false,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  pinHash?: string;
 }

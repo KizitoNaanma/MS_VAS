@@ -75,6 +75,14 @@ export class UpdateUserDto {
   passwordHash?: string | null;
   @ApiProperty({
     type: 'string',
+    required: false,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  pinHash?: string | null;
+  @ApiProperty({
+    type: 'string',
     format: 'date-time',
     required: false,
     nullable: true,

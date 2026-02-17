@@ -17,6 +17,7 @@ import {
   SUPERADMIN_EMAILS,
   ResendOtpDto,
   PhoneAuthMethodEnum,
+  ISetupProfile,
 } from 'src/common';
 import { randomUUID } from 'crypto';
 // import { InMemoryCacheService } from 'src/shared/cache/in-memory-cache/in-memory-cache.service';
@@ -302,12 +303,18 @@ export class AuthService {
     );
     await this.updateRefreshToken(refreshToken, id);
 
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: { isProfileComplete: true },
+    });
+
     return {
       success: true,
       message: 'Verified successfully',
       data: {
         accessToken,
         refreshToken,
+        isProfileComplete: user.isProfileComplete,
         cookieOptions: {
           httpOnly: true,
           secure: env.isProd,
@@ -417,7 +424,7 @@ export class AuthService {
   async signIn(
     payload: LoginDto,
   ): Promise<IServiceResponse> {
-    const { email, password, phone } = payload;
+    const { email, password, phone, pin } = payload;
 
     if (email === undefined && phone === undefined) {
       return {
@@ -452,6 +459,8 @@ export class AuthService {
         email: true,
         phone: true,
         adminStatus: true,
+        pinHash: true,
+        isProfileComplete: true,
       },
     });
 
@@ -483,27 +492,65 @@ export class AuthService {
       lastLogin: new Date(),
     };
 
-    // Check if user signed up with phone number and is subscribed
+    // Check if user signed up with phone number
     if (user.signUpType === SignUpTypeEnum.PHONE) {
-      // const userSubscription = await this.prisma.subscription.findFirst({
-      //   where: {
-      //     userId: user.id,
-      //     status: SubscriptionStatus.ACTIVE,
-      //     OR: [
-      //       { endDate: { gt: new Date() } },
-      //       { endDate: null }, // ondemand subscriptions
-      //     ],
-      //   },
-      //   orderBy: { createdAt: 'desc' },
-      // });
+      // If PIN is provided, verify it
+      if (user.pinHash) {
+        if (!pin) {
+          return {
+            success: false,
+            message: 'PIN is required for sign in.',
+          };
+        }
 
-      // if (!userSubscription) {
-      //   return {
-      //     success: false,
-      //     message: 'You need to subscribe to continue.',
-      //   };
-      // }
+        const correctPin = await this.encryption.compareHash(pin, user.pinHash);
+        if (!correctPin) {
+          return {
+            success: false,
+            message: 'Incorrect PIN, please try again.',
+          };
+        }
 
+        // Generate tokens directly
+        const { id, email } = user;
+        const jwtPayload = { id, email };
+
+        const oneHr = this.time.convertToSeconds('hours', 1);
+        const sevenDays = this.time.convertToSeconds('days', 7);
+        const accessToken = await this.jwt.sign(
+          jwtPayload,
+          oneHr,
+          TokenTypeEnum.ACCESS,
+        );
+        const refreshToken = await this.jwt.sign(
+          jwtPayload,
+          sevenDays,
+          TokenTypeEnum.REFRESH,
+        );
+        await this.updateRefreshToken(refreshToken, id);
+
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: updateData,
+        });
+
+        return {
+          success: true,
+          message: 'Logged in successfully',
+          data: {
+            accessToken,
+            refreshToken,
+            cookieOptions: {
+              httpOnly: true,
+              secure: env.isProd,
+              sameSite: 'strict',
+              maxAge: sevenDays * 1000, // convert to milliseconds
+            },
+          },
+        };
+      }
+
+      // If no PIN hash (legacy or onboarding incomplete), send OTP
       const oneHr = this.time.convertToMilliseconds('hours', 1);
 
       const otpCode = this.string.randomNumbers(6);
@@ -518,13 +565,6 @@ export class AuthService {
         user.fullName,
         String(otpCode),
       );
-
-      // if (userSubscription.accessCount >= userSubscription.maxAccess) {
-      //   return {
-      //     success: false,
-      //     message: 'You have reached the maximum number of notifications.',
-      //   };
-      // }
 
       await this.prisma.user.update({
         where: {
@@ -906,6 +946,51 @@ export class AuthService {
           maxAge: sevenDays * 1000, // convert to milliseconds
         },
       },
+    };
+  }
+
+  /**
+   * Complete user profile with DOB, PIN and age confirmation
+   */
+  async setupProfile(
+    userId: string,
+    payload: ISetupProfile,
+  ): Promise<IServiceResponse> {
+    const { dob, pin, ageConfirmed } = payload;
+
+    if (!ageConfirmed) {
+      return {
+        success: false,
+        message: 'You must confirm that you are 18 years or older.',
+      };
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: 'User not found.',
+      };
+    }
+
+    const pinHash = await this.encryption.hash(pin);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        dob: new Date(dob),
+        pinHash,
+        ageConfirmed: true,
+        isProfileComplete: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Profile setup completed successfully.',
     };
   }
 }

@@ -35,6 +35,7 @@ import {
   AuthorizationRequired,
   RefreshTokenResponseDto,
   IResponse,
+  SetupProfileDto,
 } from 'src/common';
 import {
   ApiBearerAuth,
@@ -290,6 +291,27 @@ export class AuthController {
       );
     }
 
+    return this.response.sendResponse(res, serviceResponse);
+  }
+
+  @ApiOperation({ summary: 'Setup user profile (DOB, PIN, Age Confirmation)' })
+  @ApiOkResponse({
+    description: 'Profile setup successful',
+  })
+  @ApiErrorDecorator(HttpStatus.BAD_REQUEST, 'Profile setup failed')
+  @ApiBearerAuth()
+  @AuthorizationRequired()
+  @Post('/setup-profile')
+  async setupProfile(
+    @CurrentUser() user: UserEntity,
+    @Body() body: SetupProfileDto,
+    @Res() res: Response,
+  ) {
+    const { id } = user;
+    const serviceResponse: IServiceResponse = await this.services.setupProfile(
+      id,
+      body,
+    );
     return this.response.sendResponse(res, serviceResponse);
   }
 }

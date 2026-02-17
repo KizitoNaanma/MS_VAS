@@ -94,7 +94,44 @@ export class LoginDto {
   })
   @IsOptional()
   @IsString()
-  public readonly password: string;
+  public readonly password?: string;
+
+  @ApiProperty({
+    type: 'string',
+    required: false,
+    description: '6-digit PIN for phone-based logins',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(6, 6)
+  public readonly pin?: string;
+}
+
+export class SetupProfileDto {
+  @ApiProperty({
+    type: 'string',
+    format: 'date',
+    example: '2000-01-01',
+  })
+  @IsNotEmpty()
+  @IsString()
+  public readonly dob: string;
+
+  @ApiProperty({
+    type: 'string',
+    description: '6-digit PIN for subsequent logins',
+  })
+  @IsNotEmpty()
+  @IsString()
+  @Length(6, 6)
+  public readonly pin: string;
+
+  @ApiProperty({
+    type: 'boolean',
+    description: 'Confirmation that user is 18 years or older',
+  })
+  @IsNotEmpty()
+  public readonly ageConfirmed: boolean;
 }
 
 export class RequestPasswordResetOtpDto {

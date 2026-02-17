@@ -66,6 +66,11 @@ export class UserDto {
   passwordHash: string | null;
   @ApiProperty({
     type: 'string',
+    nullable: true,
+  })
+  pinHash: string | null;
+  @ApiProperty({
+    type: 'string',
   })
   refreshToken: string;
   @ApiProperty({
@@ -76,6 +81,14 @@ export class UserDto {
     type: 'boolean',
   })
   phoneVerified: boolean;
+  @ApiProperty({
+    type: 'boolean',
+  })
+  isProfileComplete: boolean;
+  @ApiProperty({
+    type: 'boolean',
+  })
+  ageConfirmed: boolean;
   @ApiProperty({
     type: 'string',
     format: 'date-time',

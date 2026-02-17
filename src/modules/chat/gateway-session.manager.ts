@@ -1,16 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { createClient, RedisClientType } from 'redis';
-import {
-  REDIS_HOST,
-  REDIS_PASSWORD,
-  REDIS_PORT,
-  REDIS_TLS,
-  REDIS_USERNAME,
-  REDIS_URL,
-} from 'src/common';
+import { createClient } from 'redis';
 import { AuthenticatedUserSocket } from 'src/common/interfaces';
 import { UserEntity } from 'src/shared/database/prisma/generated/user.entity';
 import { TimeUtilsService } from '../utils';
+import redisConfig from 'src/shared/cache/redis/redis-config';
 
 export interface IGatewaySessionManager {
   getUserSocket(id: string): Promise<AuthenticatedUserSocket | null>;
@@ -26,7 +19,7 @@ interface SocketInfo {
 
 @Injectable()
 export class GatewaySessionManager implements IGatewaySessionManager {
-  private redisClient: RedisClientType;
+  private redisClient: any;
   private readonly logger = new Logger(GatewaySessionManager.name);
   private readonly SOCKET_PREFIX = 'socket:';
 
@@ -52,40 +45,7 @@ export class GatewaySessionManager implements IGatewaySessionManager {
   };
 
   private async initializeRedisConnection() {
-    this.redisClient = createClient({
-      ...(REDIS_URL
-        ? { url: REDIS_URL }
-        : {
-            username: String(REDIS_USERNAME),
-            password: String(REDIS_PASSWORD),
-            socket: {
-              host: String(REDIS_HOST),
-              port: Number(REDIS_PORT),
-              tls: REDIS_TLS === 'true',
-              rejectUnauthorized: false,
-            },
-          }),
-      socket: {
-        ...(REDIS_URL
-          ? {}
-          : {
-              host: String(REDIS_HOST),
-              port: Number(REDIS_PORT),
-            }),
-        tls: String(REDIS_TLS) === 'true',
-        rejectUnauthorized: false,
-        reconnectStrategy: (retries, cause) => {
-          if (cause) {
-            this.logger.error(`Redis reconnection error: ${cause}`);
-          }
-          if (retries > 3) {
-            return new Error('Failed to connect to Redis');
-          }
-          return Math.min(retries * 50, 2000);
-        },
-      },
-      pingInterval: 120000,
-    });
+    this.redisClient = createClient(redisConfig);
 
     this.redisClient.on('error', (err) =>
       this.logger.error('Gateway Session Manager Client Error:', err),

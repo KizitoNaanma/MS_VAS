@@ -6,16 +6,11 @@ import { INestApplicationContext, Logger } from '@nestjs/common';
 import { UnAuthorizedWebsocketException } from 'src/exceptions';
 import { JwtPayload } from 'jsonwebtoken';
 import {
-  REDIS_HOST,
-  REDIS_PASSWORD,
-  REDIS_PORT,
-  REDIS_TLS,
-  REDIS_USERNAME,
-  REDIS_URL,
   TokenTypeEnum,
 } from 'src/common';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
+import redisConfig from 'src/shared/cache/redis/redis-config';
 
 export class WebsocketAdapter extends IoAdapter {
   private readonly jwtService: JwtUtilsService;
@@ -47,40 +42,7 @@ export class WebsocketAdapter extends IoAdapter {
   };
 
   async connectToRedis(): Promise<void> {
-    const pubClient = createClient({
-      ...(REDIS_URL
-        ? { url: REDIS_URL }
-        : {
-            username: String(REDIS_USERNAME),
-            password: String(REDIS_PASSWORD),
-            socket: {
-              host: String(REDIS_HOST),
-              port: Number(REDIS_PORT),
-              tls: REDIS_TLS === 'true',
-              rejectUnauthorized: false,
-            },
-          }),
-      socket: {
-        ...(REDIS_URL
-          ? {}
-          : {
-              host: String(REDIS_HOST),
-              port: Number(REDIS_PORT),
-            }),
-        tls: String(REDIS_TLS) === 'true',
-        rejectUnauthorized: false,
-        reconnectStrategy: (retries, cause) => {
-          if (cause) {
-            this.logger.error(`Redis reconnection error: ${cause}`);
-          }
-          if (retries > 3) {
-            return new Error('Failed to connect to Redis');
-          }
-          return Math.min(retries * 50, 2000);
-        },
-      },
-      pingInterval: 120000,
-    });
+    const pubClient = createClient(redisConfig);
     const subClient = pubClient.duplicate();
 
     await Promise.all([

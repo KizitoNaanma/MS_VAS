@@ -4,24 +4,21 @@ import {
   REDIS_PASSWORD,
   REDIS_TLS,
   REDIS_USERNAME,
-  REDIS_URL,
 } from 'src/common';
 import { RedisOptions } from 'ioredis';
 
-const redisConfig: string | RedisOptions = REDIS_URL
-  ? REDIS_URL
-  : {
-      username: String(REDIS_USERNAME),
-      password: String(REDIS_PASSWORD),
-      host: String(REDIS_HOST),
-      port: Number(REDIS_PORT),
-      tls:
-        REDIS_TLS === 'true'
-          ? {
-              rejectUnauthorized: false,
-            }
-          : undefined,
-    };
+const redisConfig: RedisOptions = {
+  username: String(REDIS_USERNAME),
+  password: String(REDIS_PASSWORD),
+  host: String(REDIS_HOST),
+  port: Number(REDIS_PORT),
+  tls:
+    REDIS_TLS === 'true'
+      ? {
+          rejectUnauthorized: false,
+        }
+      : undefined,
+};
 
 const defaultJobOptions = {
   attempts: 3,

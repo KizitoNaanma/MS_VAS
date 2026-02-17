@@ -3,12 +3,6 @@ import {
   ADMIN_JS_EMAIL,
   ADMIN_JS_PWD,
   env,
-  REDIS_HOST,
-  REDIS_PORT,
-  REDIS_PASSWORD,
-  REDIS_TLS,
-  REDIS_USERNAME,
-  REDIS_URL,
 } from 'src/common';
 
 import { DatabaseServicesModule } from 'src/common/services/database/database.module';
@@ -17,6 +11,7 @@ import { PrismaClient } from '@prisma/client';
 import { ResourceBuilder } from './resourceBuilder';
 import RedisStore from 'connect-redis';
 import { createClient } from 'redis';
+import redisConfig from 'src/shared/cache/redis/redis-config';
 
 const authenticate = async (email: string, password: string) => {
   if (email === ADMIN_JS_EMAIL && password === ADMIN_JS_PWD) {
@@ -43,43 +38,7 @@ const consoleLogRedisConnectionError = (err: any) => {
   return false;
 };
 
-const redisClient = createClient({
-  ...(REDIS_URL
-    ? { url: REDIS_URL }
-    : {
-        username: String(REDIS_USERNAME),
-        password: String(REDIS_PASSWORD),
-        socket: {
-          host: String(REDIS_HOST),
-          port: Number(REDIS_PORT),
-          tls: REDIS_TLS === 'true',
-          rejectUnauthorized: false,
-        },
-      }),
-  socket: {
-    ...(REDIS_URL
-      ? {}
-      : {
-          host: String(REDIS_HOST),
-          port: Number(REDIS_PORT),
-        }),
-    tls: String(REDIS_TLS) === 'true',
-    rejectUnauthorized: false,
-    reconnectStrategy(retries, cause) {
-      if (cause) {
-        Logger.error(
-          `Redis reconnection error: ${cause}`,
-          'AdminJS Redis Client',
-        );
-      }
-      if (retries > 3) {
-        return new Error('Failed to connect to Redis');
-      }
-      return Math.min(retries * 50, 2000);
-    },
-  },
-  pingInterval: 120000,
-});
+const redisClient = createClient(redisConfig);
 
 redisClient.connect().catch(consoleLogRedisConnectionError);
 

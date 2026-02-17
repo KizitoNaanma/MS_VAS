@@ -5,53 +5,32 @@ import {
   REDIS_HOST,
   REDIS_PASSWORD,
   REDIS_TLS,
-  REDIS_URL,
 } from 'src/common';
-import {
-  RedisClientOptions,
-  RedisFunctions,
-  RedisModules,
-  RedisScripts,
-} from 'redis';
 
-const redisConfig: RedisClientOptions<
-  RedisModules,
-  RedisFunctions,
-  RedisScripts
-> = {
-  ...(REDIS_URL ? { url: REDIS_URL } : {
-    username: String(REDIS_USERNAME),
-    password: String(REDIS_PASSWORD),
-    socket: {
-      host: String(REDIS_HOST),
-      port: Number(REDIS_PORT),
-      tls: REDIS_TLS === 'true',
-      rejectUnauthorized: false,
+const socketOptions = {
+  host: String(REDIS_HOST),
+  port: Number(REDIS_PORT),
+  tls: String(REDIS_TLS) === 'true',
+  rejectUnauthorized: false,
+  reconnectStrategy(retries: number, cause: Error) {
+    if (cause) {
+      Logger.error(
+        `Redis reconnection error: ${cause.message}`,
+        'Redis Service Client',
+      );
     }
-  }),
-  socket: {
-    ...(REDIS_URL
-      ? {}
-      : {
-          host: String(REDIS_HOST),
-          port: Number(REDIS_PORT),
-        }),
-    tls: String(REDIS_TLS) === 'true',
-    rejectUnauthorized: false,
-    reconnectStrategy(retries, cause) {
-      if (cause) {
-        Logger.error(
-          `Redis reconnection error: ${cause}`,
-          'Redis Service Client',
-        );
-      }
-      if (retries > 3) {
-        return new Error('Failed to connect to Redis');
-      }
-      return Math.min(retries * 50, 2000);
-    },
+    if (retries > 3) {
+      return new Error('Failed to connect to Redis');
+    }
+    return Math.min(retries * 50, 2000);
   },
+};
+
+const redisConfig: any = {
+  username: String(REDIS_USERNAME),
+  password: String(REDIS_PASSWORD),
   pingInterval: 120000,
+  socket: socketOptions,
 };
 
 export default redisConfig;

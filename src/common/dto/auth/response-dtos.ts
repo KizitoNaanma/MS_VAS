@@ -13,6 +13,12 @@ class JwtTokenPairDto {
     type: 'string',
   })
   refreshToken: string;
+  @ApiProperty({
+    type: 'boolean',
+    required: false,
+    description: 'Whether the user has completed their profile onboarding',
+  })
+  isProfileComplete?: boolean;
 }
 
 class JwtAccessTokenDto {

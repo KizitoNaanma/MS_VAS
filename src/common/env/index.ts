@@ -15,16 +15,14 @@ export const GOOGLE_CLIENT_ID = configService.get('GOOGLE_CLIENT_ID');
 export const GOOGLE_CLIENT_SECRET = configService.get('GOOGLE_CLIENT_SECRET');
 export const GOOGLE_REFRESH_TOKEN = configService.get('GOOGLE_REFRESH_TOKEN');
 
-export const REDIS_HOST =
-  configService.get('REDIS_HOST') || process.env.REDIS_HOST;
-export const REDIS_PORT =
-  configService.get('REDIS_PORT') || process.env.REDIS_PORT;
-export const REDIS_USERNAME =
-  configService.get('REDIS_USERNAME') || process.env.REDIS_USERNAME;
-export const REDIS_PASSWORD =
-  configService.get('REDIS_PASSWORD') || process.env.REDIS_PASSWORD;
-export const REDIS_TLS = configService.get('REDIS_TLS') || process.env.REDIS_TLS;
-export const REDIS_URL = configService.get('REDIS_URL') || process.env.REDIS_URL;
+const sanitizeEnv = (val: any) => (val ? String(val).trim().replace(/^["']|["']$/g, '') : undefined);
+
+export const REDIS_HOST = sanitizeEnv(configService.get('REDIS_HOST') || process.env.REDIS_HOST);
+export const REDIS_PORT = sanitizeEnv(configService.get('REDIS_PORT') || process.env.REDIS_PORT);
+export const REDIS_USERNAME = sanitizeEnv(configService.get('REDIS_USERNAME') || process.env.REDIS_USERNAME);
+export const REDIS_PASSWORD = sanitizeEnv(configService.get('REDIS_PASSWORD') || process.env.REDIS_PASSWORD);
+export const REDIS_TLS = sanitizeEnv(configService.get('REDIS_TLS') || process.env.REDIS_TLS);
+export const REDIS_URL = sanitizeEnv(configService.get('REDIS_URL') || process.env.REDIS_URL);
 
 export const IQ_BIBLE_RAPID_API_KEY = configService.get(
   'IQ_BIBLE_RAPID_API_KEY',

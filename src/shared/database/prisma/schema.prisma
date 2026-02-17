@@ -77,10 +77,13 @@ model User {
   religion     String?
   profilePhoto String?
 
-  passwordHash  String? @unique
-  refreshToken  String  @default("")
-  emailVerified Boolean @default(false)
-  phoneVerified Boolean @default(false)
+  passwordHash      String? @unique
+  pinHash           String? @unique
+  refreshToken      String  @default("")
+  emailVerified     Boolean @default(false)
+  phoneVerified     Boolean @default(false)
+  isProfileComplete Boolean @default(false)
+  ageConfirmed      Boolean @default(false)
 
   preferredNotificationTime DateTime?
   dailyNotifications        Boolean   @default(false)
