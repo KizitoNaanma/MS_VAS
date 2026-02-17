@@ -80,11 +80,17 @@ async function bootstrap() {
     const documentFactory = () => SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('v1/docs', app, documentFactory, customOptions);
 
+    const port = PORT || 4000;
     await app
-      .listen(PORT)
-      .then(() => Logger.log(`server running on port ${PORT}`, 'Bootstrap'));
+      .listen(port)
+      .then(() => Logger.log(`server running on port ${port}`, 'Bootstrap'));
   } catch (error) {
-    console.log(error);
+    Logger.error(`Application failed to start: ${error}`, 'Bootstrap');
+    console.error(error);
+    // On Render/Production, we want to exit so the platform knows it failed
+    if (process.env.NODE_ENV !== 'development') {
+      process.exit(1);
+    }
   }
 }
 bootstrap();

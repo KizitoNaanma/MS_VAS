@@ -9,7 +9,7 @@ export const JWT_SECRET_KEY = configService.get('JWT_SECRET_KEY');
 export const JWT_REFRESH_SECRET_KEY = configService.get(
   'JWT_REFRESH_SECRET_KEY',
 );
-export const PORT = configService.get('PORT');
+export const PORT = Number(configService.get('PORT') || process.env.PORT || 4000);
 export const GMAIL = configService.get('GMAIL');
 export const GOOGLE_CLIENT_ID = configService.get('GOOGLE_CLIENT_ID');
 export const GOOGLE_CLIENT_SECRET = configService.get('GOOGLE_CLIENT_SECRET');
